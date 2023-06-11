@@ -16,11 +16,12 @@
 #include <string.h>
 #include <zlib.h>
 #include "colours.h"
-#include "compare-seqs.h"
+#include "primers.h"
+#include "structs.h"
+#include "definitions.h"
 #include "create-snps.h"
 #include "kseq.h"
 #include "print-sequences.h"
-#include "read_primers.h"
 #include "rob_dna.h"
 #include "seqs_to_ints.h"
 #include "version.h"

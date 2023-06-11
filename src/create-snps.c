@@ -7,6 +7,8 @@
 #include <string.h>
 #include <stdio.h>
 #include "create-snps.h"
+#include "primers.h"
+#include "structs.h"
 #include "seqs_to_ints.h"
 
 

@@ -2,10 +2,6 @@
  * abstracting out the hash function
  */
 
-#include "match-all-snps.h"
-
-
-
 
 unsigned hash (char *s) {
 	unsigned hashval;

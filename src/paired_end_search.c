@@ -15,16 +15,20 @@
 #include <stdbool.h>
 #include <math.h>
 #include <stdint.h>
+
 #include "colours.h"
-#include "compare-seqs.h"
 #include "create-snps.h"
+#include "definitions.h"
 #include "hash.h"
 #include "kseq.h"
-#include "match-all-snps.h"
 #include "primer-match-counts.h"
-#include "read_primers.h"
+#include "primers.h"
+#include "print-sequences.h"
 #include "rob_dna.h"
+#include "search.h"
 #include "seqs_to_ints.h"
+#include "structs.h"
+#include "version.h"
 
 KSEQ_INIT(gzFile, gzread);
 

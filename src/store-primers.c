@@ -3,7 +3,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
-#include "compare-seqs.h"
+#include "structs.h"
+#include "primers.h"
 #include "print-sequences.h"
 #include "seqs_to_ints.h"
 

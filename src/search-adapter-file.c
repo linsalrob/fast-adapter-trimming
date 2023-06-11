@@ -9,7 +9,8 @@
 #include <zlib.h>
 #include <getopt.h>
 #include <string.h>
-#include "match-all-snps.h"
+#include "structs.h"
+#include "search.h"
 #include "colours.h"
 #include "version.h"
 
