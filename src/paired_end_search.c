@@ -42,23 +42,13 @@ void paired_end_search(struct options *opt) {
 	 * 	opt->tablesize = the size of the table to store R1 reads. Should be resonably large to avoid O(n) behaviour
 	 */	
 	
+	fprintf(stderr, "PAIRWISE searching\n");
+
 	// for this search we need an R1 file and an R2 file
 	if (opt->R1_file == NULL || opt->R2_file == NULL) {
 		fprintf(stderr, "%sPlease provide both R1 and R2 files for paired end trimming%s\n", RED, ENDC);
 		exit(EXIT_FAILURE);
 	}
-
-	typedef struct COUNTS {
-		int R1_seqs;
-		int R2_seqs;
-		int R1_found;
-		int R2_found;
-		int R1_adjusted;
-		int R2_adjusted;
-		int R1_trimmed;
-		int R2_trimmed;
-		int same;
-	} COUNTS;
 
 	COUNTS counts = {};
 
@@ -106,6 +96,9 @@ void paired_end_search(struct options *opt) {
 
 	struct R1_read **reads;
 	reads = malloc(sizeof(*reads) * opt->tablesize);
+	for (int i = 0; i<opt->tablesize; i++)
+		reads[i] = NULL;
+
 
 	if (reads == NULL) {
 		fprintf(stderr, "%sERROR: We can not allocate memory for a table size of %d. Please try a smaller value for -t%s\n", RED, opt->tablesize, ENDC);
@@ -184,7 +177,7 @@ void paired_end_search(struct options *opt) {
 			kmer_bst_t *ks = find_primer(enc, all_primers[kmer_lengths[i]]);
 			if (ks) {
 				if (opt->R1_matches)
-					fprintf(match_out, "R1\t%s\t%s\t0\t-%ld\n", ks->id, seq->name.s, strlen(seq->seq.s));
+					fprintf(match_out, "R1\t%s\t%s\t0\t-%ld\n", ks->id, seq->name.s, seq->seq.l);
 				counts.R1_found++;
 				count_primer_occurrence(pc, ks->id, '^', seq->seq.s[kmer_lengths[i]+1]); //save the primer count for reporting
 				R1read->trim = 0;
@@ -206,7 +199,7 @@ void paired_end_search(struct options *opt) {
 				kmer_bst_t *ks = find_primer(enc, all_primers[kmer_lengths[i]]);
 				if (ks) {
 					if (opt->R1_matches)
-						fprintf(match_out, "R1\t%s\t%s\t%d\t-%ld\n", ks->id, seq->name.s, posn, strlen(seq->seq.s)-posn);
+						fprintf(match_out, "R1\t%s\t%s\t%d\t-%ld\n", ks->id, seq->name.s, posn, seq->seq.l-posn);
 					counts.R1_found++;
 					count_primer_occurrence(pc, ks->id, seq->seq.s[posn-1], seq->seq.s[kmer_lengths[i]+1]); //save the primer count for reporting
 					R1read->trim = posn;
@@ -279,7 +272,7 @@ void paired_end_search(struct options *opt) {
 
 			if (ks) {
 				if (opt->R2_matches)
-					fprintf(match_out, "R2\t%s\t%s\t0\t-%ld\n", ks->id, seq->name.s, strlen(seq->seq.s));
+					fprintf(match_out, "R2\t%s\t%s\t0\t-%ld\n", ks->id, seq->name.s, seq->seq.l);
 				counts.R2_found++;
 				count_primer_occurrence(pc, ks->id, '^', seq->seq.s[kmer_lengths[i]+1]); //save the primer count for reporting
 				trim = 0;
@@ -296,7 +289,7 @@ void paired_end_search(struct options *opt) {
 					kmer_bst_t *ks = find_primer(enc, all_primers[kmer_lengths[i]]);
 					if (ks) {
 						if (opt->R2_matches)
-							fprintf(match_out, "R2\t%s\t%s\t%d\t-%ld\n", ks->id, seq->name.s, posn, strlen(seq->seq.s)-posn);
+							fprintf(match_out, "R2\t%s\t%s\t%d\t-%ld\n", ks->id, seq->name.s, posn, seq->seq.l-posn);
 						counts.R2_found++;
 						count_primer_occurrence(pc, ks->id, seq->seq.s[posn-1], seq->seq.s[kmer_lengths[i]+1]); //save the primer count for reporting
 						trim = posn;
@@ -404,6 +397,8 @@ void paired_end_search(struct options *opt) {
 					}
 				}
 				R1 = R1->next;
+				if (R1 == NULL)
+					break;
 			}
 			fprintf(pipe, "@%s %s\n%s\n+\n%s\n", seq->name.s, seq->comment.s, seq->seq.s, seq->qual.s);
 		}

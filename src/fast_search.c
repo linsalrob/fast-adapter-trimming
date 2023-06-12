@@ -38,17 +38,7 @@ void fast_search(struct options *opt) {
 	 * 	opt->verbose = sometimes more output!
 	 */	
 
-	typedef struct COUNTS {
-		int R1_seqs;
-		int R2_seqs;
-		int R1_found;
-		int R2_found;
-		int R1_adjusted;
-		int R2_adjusted;
-		int R1_trimmed;
-		int R2_trimmed;
-		int same;
-	} COUNTS;
+	fprintf(stderr, "FAST searching\n");
 
 	COUNTS counts = {};
 
@@ -153,7 +143,7 @@ void fast_search(struct options *opt) {
 
 			int trim = -1;
 			char *primerid;
-			primerid = malloc(sizeof(char) * MAXLINELEN);
+			// primerid = malloc(sizeof(char) * MAXLINELEN);
 			char before;
 			char after;
 
@@ -170,7 +160,7 @@ void fast_search(struct options *opt) {
 				uint64_t enc  = encoded_kmers[i];
 				kmer_bst_t *ks = find_primer(enc, all_primers[kmer_lengths[i]]);
 				if (ks) {
-					strcpy(primerid, ks->id);
+					primerid = strdup(ks->id);
 					before = '^';
 					after = seq->seq.s[kmer_lengths[i]+1];
 					trim = 0;
@@ -186,7 +176,7 @@ void fast_search(struct options *opt) {
 					kmer_bst_t *ks = find_primer(enc, all_primers[kmer_lengths[i]]);
 					if (ks) {
 						if (trim == -1 || posn < trim) {
-							strcpy(primerid, ks->id);
+							primerid = strdup(ks->id);
 							before = seq->seq.s[posn-1];
 							after = seq->seq.s[kmer_lengths[i]+1];
 							trim = posn;
@@ -199,14 +189,13 @@ void fast_search(struct options *opt) {
 				counts.R1_found++;
 				count_primer_occurrence(pc, primerid, before, after);
 				if (opt->R1_matches)
-					fprintf(match_out, "R1\t%s\t%s\t%d\t-%ld\n", primerid, seq->name.s, trim, strlen(seq->seq.s)-trim);
+					fprintf(match_out, "R1\t%s\t%s\t%d\t-%ld\n", primerid, seq->name.s, trim, seq->seq.l-trim);
 				seq->seq.s[trim] = '\0';
 				seq->qual.s[trim] = '\0';
 				counts.R1_trimmed++;
 			}
 			if (pipe)
 				fprintf(pipe, "@%s %s\n%s\n+\n%s\n", seq->name.s, seq->comment.s, seq->seq.s, seq->qual.s);
-
 		}
 
 		// I am going to reset kseq so we have to initiate it again later
@@ -265,7 +254,7 @@ void fast_search(struct options *opt) {
 
 			int trim = -1;
 			char *primerid;
-			primerid = malloc(sizeof(char) * MAXLINELEN);
+			// primerid = malloc(sizeof(char) * MAXLINELEN);
 			char before;
 			char after;
 
@@ -275,7 +264,7 @@ void fast_search(struct options *opt) {
 
 				if (ks) {
 					counts.R2_found++;
-					strcpy(primerid, ks->id);
+					primerid = strdup(ks->id);
 					before = '^';
 					after = seq->seq.s[kmer_lengths[i]+1];
 					trim = 0;
@@ -290,7 +279,7 @@ void fast_search(struct options *opt) {
 					kmer_bst_t *ks = find_primer(enc, all_primers[kmer_lengths[i]]);
 					if (ks) {
 						if (trim == -1 || trim < posn)	{
-							strcpy(primerid, ks->id);
+							primerid = strdup(ks->id);
 							before = seq->seq.s[posn-1];
 							after = seq->seq.s[kmer_lengths[i]+1];
 							trim = posn;
@@ -302,15 +291,13 @@ void fast_search(struct options *opt) {
 				counts.R2_found++;
 				count_primer_occurrence(pc, primerid, before, after);
 				if (opt->R2_matches)
-					fprintf(match_out, "R2\t%s\t%s\t%d\t-%ld\n", primerid, seq->name.s, trim, strlen(seq->seq.s)-trim);
+					fprintf(match_out, "R2\t%s\t%s\t%d\t-%ld\n", primerid, seq->name.s, trim, seq->seq.l-trim);
 				seq->seq.s[trim] = '\0';
 				seq->qual.s[trim] = '\0';
 				counts.R2_trimmed++;
 			}
 			if (pipe)
 				fprintf(pipe, "@%s %s\n%s\n+\n%s\n", seq->name.s, seq->comment.s, seq->seq.s, seq->qual.s);
-
-
 		}
 		if (pipe)
 			pclose(pipe);

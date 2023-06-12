@@ -51,7 +51,7 @@ void read_primers(char* primerfile, kmer_bst_t** all_primers, bool reverse, int 
 	seq = kseq_init(fp);
 	int l;
 	while ((l = kseq_read(seq)) >= 0) {
-		int kmer = strlen(seq->seq.s);
+		int kmer = seq->seq.l;
 		if (seq->seq.l > MAXKMER) {
 			fprintf(stderr, "%sWARNING: Length of %s is longer than our maximum (%ld bp), so we had to truncate it%s\n", RED, seq->name.s, seq->seq.l, ENDC);
 			kmer = MAXKMER;
@@ -60,9 +60,9 @@ void read_primers(char* primerfile, kmer_bst_t** all_primers, bool reverse, int 
 		
 		add_primer(enc, seq->name.s, all_primers[kmer]);
 		if (reverse) {
-			uint64_t rcenc = kmer_encoding(seq->seq.s, strlen(seq->seq.s) - kmer, kmer);
+			uint64_t rcenc = kmer_encoding(seq->seq.s, seq->seq.l - kmer, kmer);
 			enc = reverse_complement(rcenc, kmer);
-			char revname[strlen(seq->name.s)+3];
+			char revname[seq->name.l+3];
 			strcpy(revname, seq->name.s);
 			strcat(revname, " rc");
 			if (verbose)
@@ -103,7 +103,7 @@ void read_primers_create_snps(char* primerfile, kmer_bst_t** all_primers, bool r
 	seq = kseq_init(fp);
 	int l;
 	while ((l = kseq_read(seq)) >= 0) {
-		int kmer = strlen(seq->seq.s);
+		int kmer = seq->seq.l;
 		if (seq->seq.l > MAXKMER) {
 			if (verbose)
 				fprintf(stderr, "%sWARNING: Length of %s is longer than our maximum (%ld bp), so we had to truncate it%s\n", RED, seq->name.s, seq->seq.l, ENDC);
@@ -113,13 +113,13 @@ void read_primers_create_snps(char* primerfile, kmer_bst_t** all_primers, bool r
 		create_all_snps(seq->seq.s, kmer, seq->name.s, all_primers[kmer]);
 		
 		if (reverse) {
-			char revname[strlen(seq->name.s)+3];
+			char revname[seq->name.l+3];
 			strcpy(revname, seq->name.s);
 			strcat(revname, " rc");
 			if (verbose)
 				fprintf(stderr, "%sAdded a rc primer: %s %s\n", GREEN, revname, ENDC);
 			
-			char* rcseq = malloc(strlen(seq->seq.s) + 1);
+			char* rcseq = malloc(seq->seq.l + 1);
 			rc(rcseq, seq->seq.s);
 			create_all_snps(rcseq, kmer, revname, all_primers[kmer]);
 
@@ -128,6 +128,8 @@ void read_primers_create_snps(char* primerfile, kmer_bst_t** all_primers, bool r
 		if (verbose)
 			fprintf(stderr, "%sEncoding %s with length %ld using k-mer %d%s\n", GREEN, seq->seq.s, seq->seq.l, kmer, ENDC);
 	}
+	int ret = gzclose(fp);
+	if (ret != 0)
+		fprintf(stderr, "Closing the kseq filehandle returned %d\n", ret);
 	kseq_destroy(seq);
-	gzclose(fp);
 }

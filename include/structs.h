@@ -68,6 +68,22 @@ typedef struct primer_counts {
 	struct primer_counts *next_primer;
 } primer_counts_t;
 
+/*
+ * Count of things that we find
+ */
+
+typedef struct COUNTS {
+	int R1_seqs;
+	int R2_seqs;
+	int R1_found;
+	int R2_found;
+	int R1_adjusted;
+	int R2_adjusted;
+	int R1_trimmed;
+	int R2_trimmed;
+	int same;
+} COUNTS;
+
 
 
 #endif

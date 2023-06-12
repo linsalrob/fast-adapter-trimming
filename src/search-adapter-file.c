@@ -60,6 +60,7 @@ int main(int argc, char* argv[]) {
 	opt->primer_occurrences = 50;
 	opt->reverse = true;
 	opt->primers = NULL;
+	opt->paired_end = false;
 	opt->debug = false;
 	opt->verbose = false;
 	opt->adjustments = NULL;

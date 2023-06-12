@@ -12,7 +12,7 @@ void count_primer_occurrence(primer_counts_t *pc, char * id, char before, char a
 
 	primer_counts_t *n = pc;
 
-	while (n->id != NULL && !found) {
+	while (n != NULL && n->id != NULL && !found) {
 		if (strcmp(n->id, id) == 0) {
 			n->count++;
 			found = true;
