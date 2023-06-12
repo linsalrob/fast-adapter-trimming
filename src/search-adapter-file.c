@@ -160,28 +160,31 @@ int main(int argc, char* argv[]) {
 		paired_end_search(opt);
 	else {
 		pthread_t threads[2];
-		thread_args_t *thread_args;
-		thread_args = malloc(sizeof(thread_args_t));
-		thread_args->opt = opt;
+		thread_args_t *thread0_args;
+		thread0_args = malloc(sizeof(thread_args_t));
+		thread0_args->opt = opt;
+		thread_args_t *thread1_args;
+		thread1_args = malloc(sizeof(thread_args_t));
+		thread1_args->opt = opt;
 		// process R1
 		if (opt->R1_file) {
-			thread_args->fqfile = strdup(opt->R1_file);
+			thread0_args->fqfile = strdup(opt->R1_file);
 			if (opt->R1_matches)
-				thread_args->matches_file = strdup(opt->R1_matches);
+				thread0_args->matches_file = strdup(opt->R1_matches);
 			if (opt->R1_output)
-				thread_args->output_file = strdup(opt->R1_output);
-			int result_code = pthread_create(&threads[0], NULL, &fast_search_one_file, (void *)thread_args);
+				thread0_args->output_file = strdup(opt->R1_output);
+			int result_code = pthread_create(&threads[0], NULL, &fast_search_one_file, (void *)thread0_args);
 			if (result_code)
 				fprintf(stderr, "%sERROR: Starting thread 0 returned the error code %d%s\n", RED, result_code, ENDC);
 		}
 		// process R2
 		if (opt->R2_file) {
-			thread_args->fqfile = strdup(opt->R2_file);
+			thread1_args->fqfile = strdup(opt->R2_file);
 			if (opt->R2_matches)
-				thread_args->matches_file = strdup(opt->R2_matches);
+				thread1_args->matches_file = strdup(opt->R2_matches);
 			if (opt->R2_output)
-				thread_args->output_file = strdup(opt->R2_output);
-			int result_code = pthread_create(&threads[1], NULL, &fast_search_one_file, (void *)thread_args);
+				thread1_args->output_file = strdup(opt->R2_output);
+			int result_code = pthread_create(&threads[1], NULL, &fast_search_one_file, (void *)thread1_args);
 			if (result_code)
 				fprintf(stderr, "%sERROR: Starting thread 1 returned the error code %d%s\n", RED, result_code, ENDC);
 		}
@@ -195,7 +198,8 @@ int main(int argc, char* argv[]) {
 			if (result_code)
 				fprintf(stderr, "%sERROR: Joining thread 1 for it to finish returned the error code %d%s\n", RED, result_code, ENDC);
 		}
-		free(thread_args);
+		free(thread0_args);
+		free(thread1_args);
 	}
 
 	free(opt);
