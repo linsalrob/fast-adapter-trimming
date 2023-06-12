@@ -100,11 +100,11 @@ Short option | Long option | Required? | Meaning
 `-k` | `--matchesR2` | Optional | Where to write a list of the adapters that match the R2 reads. Same format as above.
 `-n` | `--noreverse` | Optional | Only consider the forward direction of the adapers. By default we look for both the adapter sequences as specified in `--primers` and their reverse complement.
 `-a` | `--adjustments` | Optional | Only valid with `--paired_end`. Where to write a summary of the adjustments to the R1 or R2 read trimming locations. If we find adapters in different locations in the R1 and R2 mate pairs, this file summarises the changes we made to accomodate both primers.
- | `--paired_end` | Optional | Use a paired end search which is slower and requires slightly more RAM.
- | `--primeroccurrences` | Optional | At the end we summarise the adapters that we found. This limits that output to those adapters found _n_ times or more. We often find one read that matches a single adapter (e.g. because there is a sequencing error), and so this just limits that output.
- | `--nothreads` | Optional | Only use a single thread for searching for the adapters.
- | `--versbose` | Optional | Write a lot more output
- | `--debug` | Optional | Write a lot, lot more output
+  &nbsp; | `--paired_end` | Optional | Use a paired end search which is slower and requires slightly more RAM.
+  &nbsp; | `--primeroccurrences` | Optional | At the end we summarise the adapters that we found. This limits that output to those adapters found _n_ times or more. We often find one read that matches a single adapter (e.g. because there is a sequencing error), and so this just limits that output.
+  &nbsp; | `--nothreads` | Optional | Only use a single thread for searching for the adapters.
+  &nbsp; | `--versbose` | Optional | Write a lot more output
+  &nbsp; | `--debug` | Optional | Write a lot, lot more output
 `-v` | `--version` | Optional | Print the version and exit.
 
 
