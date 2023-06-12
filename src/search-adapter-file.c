@@ -159,24 +159,18 @@ int main(int argc, char* argv[]) {
 	else if (paired_end)
 		paired_end_search(opt);
 	else {
-		fprintf(stderr, "Here 1\n");
 		pthread_t threads[2];
 		thread_args_t *thread_args;
 		thread_args = malloc(sizeof(thread_args_t));
 		thread_args->opt = opt;
 		// process R1
 		if (opt->R1_file) {
-			fprintf(stderr, "Here 2\n");
 			thread_args->fqfile = strdup(opt->R1_file);
-			fprintf(stderr, "Here 2a\n");
 			if (opt->R1_matches)
 				thread_args->matches_file = strdup(opt->R1_matches);
-			fprintf(stderr, "Here 2b\n");
 			if (opt->R1_output)
 				thread_args->output_file = strdup(opt->R1_output);
-			fprintf(stderr, "Here 3\n");
 			int result_code = pthread_create(&threads[0], NULL, &fast_search_one_file, (void *)thread_args);
-			fprintf(stderr, "Here 4\n");
 			if (result_code)
 				fprintf(stderr, "%sERROR: Starting thread 0 returned the error code %d%s\n", RED, result_code, ENDC);
 		}
