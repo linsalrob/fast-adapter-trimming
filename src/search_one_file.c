@@ -51,7 +51,7 @@ void *fast_search_one_file(void *thrargs) {
 	char* outputfile = t_args->output_file;
 	struct options *opt = t_args->opt;
 	
-	fprintf(stderr, "FAST searching in %s\n", fqfile);
+	fprintf(stderr, "FAST threaded searching in %s\n", fqfile);
 
 	COUNTS counts = {};
 
