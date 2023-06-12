@@ -88,9 +88,9 @@ Search for primers listed in --primers, allowing for 1-bp mismatches, against al
 ```
 
 
----|---|---
+---|---|---|---
 Short option | Long option | Required? | Meaning
----|---|---
+---|---|---|---
 `-1` | `--R1` | Optional | The R1 (left) reads file. This can be gzip compressed or not compressed. Note that one R1 or R2 file is required, or else there is nothing to do.
 `-2` | `--R2` | Optional | The R2 (right) reads file. This can be gzip compressed or not compressed.
 `-f` | `--primers` | Required | A (typically) fasta file with adapters sequences. This can also be gzip compressed. For examples, see the [adapter](https://github.com/linsalrob/fast-adapter-trimming/tree/main/adapters) directory.
@@ -105,7 +105,7 @@ Short option | Long option | Required? | Meaning
  | `--nothreads` | Optional | Only use a single thread for searching for the adapters.
  | `--versbose` | Optional | Write a lot more output
  | `--debug` | Optional | Write a lot, lot more output
-`-v` | `--version` | Print the version and exit.
+`-v` | `--version` | Optional | Print the version and exit.
 
 
 
