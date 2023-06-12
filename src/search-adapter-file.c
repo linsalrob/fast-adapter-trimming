@@ -9,6 +9,7 @@
 #include <zlib.h>
 #include <getopt.h>
 #include <string.h>
+#include <pthread.h>
 #include "structs.h"
 #include "search.h"
 #include "colours.h"
@@ -29,6 +30,7 @@ void help() {
 	printf("-a --adjustments Write the trimming adjustments here\n");
 	printf("--paired_end use a paired end (slower) search.\n");
 	printf("--primeroccurrences minimum number of times a primer was matched to include in the report\n");
+	printf("--nothreads use a single thread only. We typically want upto 4 threads to read and write R1 and R2 files\n");
 	printf("--verbose more output (but less than --debug)\n");
 	printf("--debug more more output\n");
 	printf("-v --version print the version and exit\n");
@@ -37,7 +39,7 @@ void help() {
 
 int main(int argc, char* argv[]) {
 	if (argc == 2 && (strcmp(argv[1], "-V") == 0)) {
-                printf("Version: %f\n", __version__);
+		printf("Version: %f\n", __version__);
 		exit(0);
 	}
 
@@ -60,97 +62,131 @@ int main(int argc, char* argv[]) {
 	opt->primer_occurrences = 50;
 	opt->reverse = true;
 	opt->primers = NULL;
-	opt->paired_end = false;
 	opt->debug = false;
 	opt->verbose = false;
 	opt->adjustments = NULL;
 
-    int gopt = 0;
-    static struct option long_options[] = {
-            {"R1",  required_argument, 0, '1'},
-            {"R2",  required_argument, 0, '2'},
-            {"primers",  required_argument, 0, 'f'},
-            {"outputR1",  required_argument, 0, 'p'},
-            {"outputR2",  required_argument, 0, 'q'},
-            {"matchesR1",  required_argument, 0, 'j'},
-            {"matchesR2",  required_argument, 0, 'k'},
-	    {"noreverse", required_argument, 0, 'n'},
-	    {"adjustments", required_argument, 0, 'a'},
-	    {"primeroccurrences", required_argument, 0, 3},
-	    {"paired_end", no_argument, 0, 4},
-            {"debug", no_argument, 0, 'd'},
-            {"version", no_argument, 0, 'v'},
-	    {"verbose", no_argument, 0, 'b'},
-            {0, 0, 0, 0}
-    };
-    int option_index = 0;
-    while ((gopt = getopt_long(argc, argv, "1:2:p:q:f:j:k:a:bndv", long_options, &option_index )) != -1) {
-        switch (gopt) {
-            case '1' :
-                opt->R1_file = strdup(optarg);
-                break;
-            case '2':
-                opt->R2_file = strdup(optarg);
-                break;
-            case 'p':
-                opt->R1_output = strdup(optarg);
-                break;
-            case 'q':
-                opt->R2_output = strdup(optarg);
-                break;
-            case 'j' :
-                opt->R1_matches = strdup(optarg);
-                break;
-            case 'k':
-                opt->R2_matches = strdup(optarg);
-                break;
-            case 'n' :
-                opt->reverse = false;
-                break;
-            case 'f':
-                opt->primers = strdup(optarg);
-                break;
-            case 'a':
-                opt->adjustments = strdup(optarg);
-                break;
-            case 'd': 
-		opt->debug = true;
-                break;
-	    case 'b':
-		opt->verbose = true;
-		break;
-            case 'v':
-                printf("Version: %f\n", __version__);
-                return 0;
-	    case 3:
-		opt->primer_occurrences = atoi(optarg);
-		break;
-	    case 4:
-		opt->paired_end = true;
-		break;
-	    default: help();
-	        exit(EXIT_FAILURE);
+	bool nothreads = false;
+	bool paired_end = false;
+
+	int gopt = 0;
+	static struct option long_options[] = {
+		{"R1",  required_argument, 0, '1'},
+		{"R2",  required_argument, 0, '2'},
+		{"primers",  required_argument, 0, 'f'},
+		{"outputR1",  required_argument, 0, 'p'},
+		{"outputR2",  required_argument, 0, 'q'},
+		{"matchesR1",  required_argument, 0, 'j'},
+		{"matchesR2",  required_argument, 0, 'k'},
+		{"noreverse", required_argument, 0, 'n'},
+		{"adjustments", required_argument, 0, 'a'},
+		{"primeroccurrences", required_argument, 0, 3},
+		{"paired_end", no_argument, 0, 4},
+		{"nothreads", no_argument, 0, 5},
+		{"debug", no_argument, 0, 'd'},
+		{"version", no_argument, 0, 'v'},
+		{"verbose", no_argument, 0, 'b'},
+		{0, 0, 0, 0}
+	};
+	int option_index = 0;
+	while ((gopt = getopt_long(argc, argv, "1:2:p:q:f:j:k:a:bndv", long_options, &option_index )) != -1) {
+		switch (gopt) {
+			case '1' :
+				opt->R1_file = strdup(optarg);
+				break;
+			case '2':
+				opt->R2_file = strdup(optarg);
+				break;
+			case 'p':
+				opt->R1_output = strdup(optarg);
+				break;
+			case 'q':
+				opt->R2_output = strdup(optarg);
+				break;
+			case 'j' :
+				opt->R1_matches = strdup(optarg);
+				break;
+			case 'k':
+				opt->R2_matches = strdup(optarg);
+				break;
+			case 'n' :
+				opt->reverse = false;
+				break;
+			case 'f':
+				opt->primers = strdup(optarg);
+				break;
+			case 'a':
+				opt->adjustments = strdup(optarg);
+				break;
+			case 'd': 
+				opt->debug = true;
+				break;
+			case 'b':
+				opt->verbose = true;
+				break;
+			case 'v':
+				printf("Version: %f\n", __version__);
+				return 0;
+			case 3:
+				opt->primer_occurrences = atoi(optarg);
+				break;
+			case 4:
+				paired_end = true;
+				break;
+			case 5:
+				nothreads = true;
+				break;
+			default: help();
+				 exit(EXIT_FAILURE);
+		}
 	}
-    }
 
-    if (opt->R1_file == NULL && opt->R2_file == NULL) {
-	    fprintf(stderr, "Please provide at least one R1 or R2 read file\n");
-	    help();
-	    exit(EXIT_FAILURE);
-    }
-    
-    if (opt->primers == NULL) {
-	    fprintf(stderr, "Please provide a primer file\n");
-	    help();
-	    exit(EXIT_FAILURE);
-    }
+	if (opt->R1_file == NULL && opt->R2_file == NULL) {
+		fprintf(stderr, "Please provide at least one R1 or R2 read file\n");
+		help();
+		exit(EXIT_FAILURE);
+	}
+
+	if (opt->primers == NULL) {
+		fprintf(stderr, "Please provide a primer file\n");
+		help();
+		exit(EXIT_FAILURE);
+	}
 
 
-    if (opt->paired_end)
-	    paired_end_search(opt);
-    else
-	    fast_search(opt);
+	if (nothreads)
+		fast_search(opt);
+	else if (paired_end)
+		paired_end_search(opt);
+	else {
+		pthread_t threads[2];
+		thread_args_t *thread_args;
+		thread_args = malloc(sizeof(thread_args_t));
+		thread_args->opt = opt;
+		// process R1
+		thread_args->fqfile = strdup(opt->R1_file);
+		thread_args->matches_file = strdup(opt->R1_matches);
+		thread_args->output_file = strdup(opt->R1_output);
+		int result_code = pthread_create(&threads[0], NULL, &fast_search_one_file, (void *)thread_args);
+		if (result_code)
+			fprintf(stderr, "%sERROR: Starting thread 0 returned the error code %d%s\n", RED, result_code, ENDC);
+		// process R2
+		thread_args->fqfile = strdup(opt->R2_file);
+		thread_args->matches_file = strdup(opt->R2_matches);
+		thread_args->output_file = strdup(opt->R2_output);
+		result_code = pthread_create(&threads[1], NULL, &fast_search_one_file, (void *)thread_args);
+		if (result_code)
+			fprintf(stderr, "%sERROR: Starting thread 1 returned the error code %d%s\n", RED, result_code, ENDC);
+		result_code = pthread_join(threads[0], NULL);
+		if (result_code)
+			fprintf(stderr, "%sERROR: Joining thread 0 for it to finish returned the error code %d%s\n", RED, result_code, ENDC);
+		result_code = pthread_join(threads[1], NULL);
+		if (result_code)
+			fprintf(stderr, "%sERROR: Joining thread 1 for it to finish returned the error code %d%s\n", RED, result_code, ENDC);
 
-    free(opt);
+		free(thread_args);
+	}
+
+	free(opt);
 }
 

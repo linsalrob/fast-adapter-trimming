@@ -2,7 +2,7 @@ IDIR =./include
 CC=gcc
 # note that usually use -O2 but for valgrind debugging use -O0 which is slower but more accurate
 CFLAGS=-g -Wall -O2 -Wno-return-type -Wno-unused-variable -Wno-unused-function -I$(IDIR)
-LFLAGS= -lz -lm 
+LFLAGS= -lz -lm -pthread
 
 ODIR=./obj/
 SDIR=./src/
@@ -21,7 +21,7 @@ install: $(BDIR)fast-adapter-trimming
 	install -m 755 $^ $(DESTDIR)$(PREFIX)
 
 BASE=seqs_to_ints rob_dna store-primers create-snps read_primers search-adapter-file hash primer-match-counts
-FAT=$(BASE) paired_end_search fast_search
+FAT=$(BASE) paired_end_search fast_search search_one_file
 fatobj := $(addsuffix .o, $(addprefix $(ODIR), $(FAT)))
 objects := $(fatobj)
 

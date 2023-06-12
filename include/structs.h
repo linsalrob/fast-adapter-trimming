@@ -20,7 +20,6 @@ struct options {
 	char* adjustments;
 	char* primers;
 	int primer_occurrences;
-	bool paired_end;
 	bool reverse;
 	int tablesize;
 	bool verbose;
@@ -84,6 +83,17 @@ typedef struct COUNTS {
 	int same;
 } COUNTS;
 
+
+/*
+ * A struct to pass the data specifically to a pthread_create thread
+ * for multi-threaded reading
+ */
+typedef struct thread_arg_struct {
+	struct options *opt;
+	char* fqfile;
+	char* matches_file;
+	char* output_file;
+} thread_args_t;
 
 
 #endif
