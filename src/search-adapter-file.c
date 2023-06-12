@@ -38,16 +38,15 @@ void help() {
 
 
 int main(int argc, char* argv[]) {
-	if (argc == 2 && (strcmp(argv[1], "-V") == 0)) {
-		printf("Version: %f\n", __version__);
+	if (argc < 2) {
+		help();
 		exit(0);
 	}
 
-	if (argc < 3) {
-		help(argv[0]);
+	if (argc == 2 && ((strcmp(argv[1], "-v") == 0) || (strcmp(argv[1], "--version") == 0))) {
+		printf("%s version: %f\n", argv[0], __version__);
 		exit(0);
 	}
-
 
 	struct options *opt;
 	opt = malloc(sizeof(struct options));
