@@ -1,8 +1,8 @@
 [![Edwards Lab](https://img.shields.io/badge/Bioinformatics-EdwardsLab-03A9F4)](https://edwards.flinders.edu.au)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![DOI](https://www.zenodo.org/badge/643454906.svg)](https://www.zenodo.org/badge/latestdoi/643454906)
-![GitHub language count](https://img.shields.io/github/languages/count/linsalrob/mgi-adapters)
-
+![GitHub language count](https://img.shields.io/github/languages/count/linsalrob/fast-adapter-trimming)
+![GitHub Continuous Integration Status](https://github.com/linsalrob/fast-adapter-trimming/actions/workflows/c.yml/badge.svg)
 
 # Fast Adapter Trimming
 
