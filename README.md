@@ -1,6 +1,6 @@
 [![Edwards Lab](https://img.shields.io/badge/Bioinformatics-EdwardsLab-03A9F4)](https://edwards.flinders.edu.au)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![DOI](https://www.zenodo.org/badge/643454906.svg)](https://www.zenodo.org/badge/latestdoi/643454906)
+[![DOI](https://www.zenodo.org/badge/652139822.svg)](https://www.zenodo.org/badge/latestdoi/652139822)
 ![GitHub language count](https://img.shields.io/github/languages/count/linsalrob/fast-adapter-trimming)
 ![GitHub Continuous Integration Status](https://github.com/linsalrob/fast-adapter-trimming/actions/workflows/c.yml/badge.svg)
 
@@ -158,7 +158,7 @@ Now that we have found the adapters, we trim the sequences at those positions an
 Check our out DOI code and please cite it as:
 
 ```
-Edwards, J.A. and Edwards, R.A. 2023 Fast Adapter Trimming: Efficient Removal of Sequencing Adapters. DOI: 
+Edwards, J.A. and Edwards, R.A. 2023. Fast Adapter Trimming: Efficient Removal of Sequencing Adapters. DOI: 10.5281/zenodo.8026363
 ```
 
 
