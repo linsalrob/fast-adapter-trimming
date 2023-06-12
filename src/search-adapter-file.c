@@ -16,7 +16,7 @@
 #include "version.h"
 
 void help() {
-	printf("USAGE: search-paired-snp -l -r -s -f -p -q\n");
+	printf("USAGE: search-paired-snp -1 -2 --primers -outputR1 --outputR2 --matchesR1 --matchesR2\n");
 	printf("\nSearch for primers listed in %s--primers%s, allowing for 1-bp mismatches, against all the reads in %s--R1%s and %s--R2%s\n", 
 			GREEN, ENDC, GREEN, ENDC, GREEN, ENDC);
 	printf("-1 --R1 R%s1%s file (%srequired%s)\n", GREEN, ENDC, RED, ENDC);
