@@ -88,7 +88,7 @@ Search for primers listed in --primers, allowing for 1-bp mismatches, against al
 ```
 
 
----|---|---|---
+
 Short option | Long option | Required? | Meaning
 ---|---|---|---
 `-1` | `--R1` | Optional | The R1 (left) reads file. This can be gzip compressed or not compressed. Note that one R1 or R2 file is required, or else there is nothing to do.
