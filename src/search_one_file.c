@@ -191,6 +191,8 @@ void *fast_search_one_file(void *thrargs) {
 							before = seq->seq.s[posn-1];
 							after = seq->seq.s[kmer_lengths[i]+1];
 							trim = posn;
+							if (opt->debug)
+								fprintf(stderr, "ID: %s PRIMERID: %s TRIM: %d kmer len: %d kmer seq: %s\n", ks->id, primerid, trim, kmer_lengths[i], kmer_decoding(enc, kmer_lengths[i]));
 						}
 					}
 				}
@@ -198,6 +200,8 @@ void *fast_search_one_file(void *thrargs) {
 
 			if (trim > -1) {
 				counts.R1_found++;
+				if (strlen(primerid) < 5)
+					fprintf(stderr, "ERROR: Trying to store a primer with name >%s< because trim %d!\n", primerid, trim);
 				count_primer_occurrence(pc, primerid, before, after);
 				if (matchesfile)
 					fprintf(match_out, "R1\t%s\t%s\t%d\t-%ld\n", primerid, seq->name.s, trim, seq->seq.l-trim);
