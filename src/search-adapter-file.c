@@ -26,8 +26,9 @@ void help() {
 	printf("-q --outputR2 R2 output fastq file (will be gzip compressed)\n");
 	printf("-j --matchesR1 Write the R1 matches to this file. Default: stdout\n");
 	printf("-k --matchesR2 Write the R2 matches to this file. Default: stdout\n");
-	printf("-n --noreverse Do not reverse the sequences\n");
-	printf("-a --adjustments Write the trimming adjustments here\n");
+	printf("-l --length Minimum sequence length (bp). Sequences shorter than this will be filtered out (Default 100)\n");
+	printf("--noreverse Do not reverse the sequences\n");
+	printf("--adjustments Write the trimming adjustments here\n");
 	printf("--paired_end use a paired end (slower) search.\n");
 	printf("--primeroccurrences minimum number of times a primer was matched to include in the report\n");
 	printf("--nothreads use a single thread only. We typically want upto 4 threads to read and write R1 and R2 files\n");
@@ -59,6 +60,7 @@ int main(int argc, char* argv[]) {
 	opt->R2_output = NULL;
 	opt->R1_matches = NULL;
 	opt->R2_matches = NULL;
+	opt->min_length = 100;
 	opt->primer_occurrences = 50;
 	opt->reverse = true;
 	opt->primers = NULL;
@@ -78,18 +80,19 @@ int main(int argc, char* argv[]) {
 		{"outputR2",  required_argument, 0, 'q'},
 		{"matchesR1",  required_argument, 0, 'j'},
 		{"matchesR2",  required_argument, 0, 'k'},
-		{"noreverse", required_argument, 0, 'n'},
-		{"adjustments", required_argument, 0, 'a'},
+		{"length", required_argument, 0, 'l'},
 		{"primeroccurrences", required_argument, 0, 3},
 		{"paired_end", no_argument, 0, 4},
 		{"nothreads", no_argument, 0, 5},
+		{"adjustments", required_argument, 0, 6},
+		{"noreverse", required_argument, 0, 7},
 		{"debug", no_argument, 0, 'd'},
 		{"version", no_argument, 0, 'v'},
 		{"verbose", no_argument, 0, 'b'},
 		{0, 0, 0, 0}
 	};
 	int option_index = 0;
-	while ((gopt = getopt_long(argc, argv, "1:2:p:q:f:j:k:a:bndv", long_options, &option_index )) != -1) {
+	while ((gopt = getopt_long(argc, argv, "1:2:p:q:f:j:k:l:bndv", long_options, &option_index )) != -1) {
 		switch (gopt) {
 			case '1' :
 				opt->R1_file = strdup(optarg);
@@ -109,14 +112,11 @@ int main(int argc, char* argv[]) {
 			case 'k':
 				opt->R2_matches = strdup(optarg);
 				break;
-			case 'n' :
-				opt->reverse = false;
-				break;
 			case 'f':
 				opt->primers = strdup(optarg);
 				break;
-			case 'a':
-				opt->adjustments = strdup(optarg);
+			case 'l':
+				opt->min_length = atoi(optarg);
 				break;
 			case 'd': 
 				opt->debug = true;
@@ -135,6 +135,12 @@ int main(int argc, char* argv[]) {
 				break;
 			case 5:
 				nothreads = true;
+				break;
+			case 6:
+				opt->adjustments = strdup(optarg);
+				break;
+			case 7:
+				opt->reverse = false;
 				break;
 			default: help();
 				 exit(EXIT_FAILURE);
