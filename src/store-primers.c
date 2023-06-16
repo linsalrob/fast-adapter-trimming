@@ -19,6 +19,9 @@ void add_primer(uint64_t encoding, char* primerid, kmer_bst_t* ks) {
 	 * kmer_bst_t since the value is also not set
 	 */
 	
+	if (!primerid)
+		fprintf(stderr, "ERROR: Trying to add a primer with encoding %ld but name |%s|\n", encoding, primerid);
+
 	if (ks->bigger == NULL && ks->smaller == NULL) {
 		ks->value = encoding;
 		ks->id = malloc(strlen(primerid) + 1);
