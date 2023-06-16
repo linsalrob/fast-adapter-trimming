@@ -224,9 +224,9 @@ void *fast_search_one_file(void *thrargs) {
 		free(all_primers[i]);
 
 	printf("File name: %s\n", fqfile);
-	printf("Total sequences: R1 %d R2 %d\n", counts.R1_seqs, counts.R2_seqs);
-	printf("Primer found: R1 %d R2 %d\n", counts.R1_found, counts.R2_found);
-	printf("Sequences trimmed: R1 %d R2 %d\n", counts.R1_trimmed, counts.R2_trimmed);
+	printf("Total sequences: %d\n", counts.R1_seqs);
+	printf("Primer found: %d\n", counts.R1_found);
+	printf("Sequences trimmed: %d\n", counts.R1_trimmed);
 
 
 	printf("\nAdapter occurrences:\n");
