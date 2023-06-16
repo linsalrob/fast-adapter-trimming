@@ -155,7 +155,6 @@ void *fast_search_one_file(void *thrargs) {
 
 			int trim = -1;
 			char *primerid;
-			// primerid = malloc(sizeof(char) * MAXLINELEN);
 			char before;
 			char after;
 
