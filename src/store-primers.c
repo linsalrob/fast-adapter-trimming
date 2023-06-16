@@ -32,8 +32,8 @@ void add_primer(uint64_t encoding, char* primerid, kmer_bst_t* ks) {
 		ks->bigger->smaller = NULL;
 		ks->smaller->bigger = NULL;
 		ks->smaller->smaller= NULL;
-		ks->bigger->value = 0;
-		ks->smaller->value = 0;
+		ks->bigger->value = -1;
+		ks->smaller->value = -1;
 		ks->bigger->id = "";
 		ks->smaller->id = "";
 		return;
