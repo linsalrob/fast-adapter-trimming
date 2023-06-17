@@ -191,11 +191,12 @@ fastp | 17,168,188
 fast-adapter-trimming<sup>1</sup> | 17,167,974
 
 
-   | Retrimmed with cutadapt | Retrimmed with fastp | Retrimmed with fast-adapter trimming
+
+Tool   | Retrimmed with cutadapt | Retrimmed with fastp | Retrimmed with fast-adapter trimming
 --- | --- | --- | ---
 Initially trimmed with cutadapt<sup>2</sup> | Full length: 0 Partial: 2,228,450 (13.0%) | 885,907 (5.2%) | 14,559 (0.08%)
 Initially trimmed wtih fastp    | Full length: 0 Partial: 1,618,009 (12.7%)  | 75,239 (0.6%) | 2,675 (0.02%)
-Initially trimmed with fast-adapter-trimming |Full length: 0 Partial: 2,839,026 (16.5%) | 1,965,436 (11.4%) | 0
+Initially trimmed with fast-adapter-trimming | Full length: 0 Partial: 2,839,026 (16.5%) | 1,965,436 (11.4%) | 0
 
 Notes:
 <sup>1</sup>`fast-adapter-trimming` only writes those sequences longer than a predefined cutoff - in this case, 100 bp
