@@ -153,6 +153,59 @@ Now that we have found the adapters, we trim the sequences at those positions an
 - If we find adapters in both reads, but at different positions, we trim to the shorter sequence. We haven't (yet) figured out why this happens, but it is only a really small subset of reads. We're working on that!
 
 
+# Timing and Accuracy Comparisons
+
+We compared fast-adapter-trimming to both [cutadapt](https://cutadapt.readthedocs.io/en/stable/) and [fastp](https://github.com/OpenGene/fastp). 
+
+We have a particular dataset that has very high (~30-40%) contamination with adapter sequences, and so we trimmed the reads using each of the three algorithms using these base commands:
+
+```bash
+R1=1690154_20180406_S_R1.fastq.gz
+R2=1690154_20180406_S_R2.fastq.gz
+PRIMERS=IlluminaAdapters.fa
+
+# fast-adapter-trimming
+fast-adapter-trimming -1 $R1 -2 $R2 --outputR1 trimmed_fat/$R1 --outputR2 trimmed_fat/$R2 --primers $PRIMERS
+
+# cutadapt
+cutadapt -a file:$PRIMERS -A file:$PRIMERS -o trimmed_cutadapt/$R1 -p trimmed_cutadapt/$R2 $R1 $R2
+
+# fastp
+fastp -Q -L --adapter_fasta $PRIMERS --in1 $R1 --in2 $R2 --out1 trimmed_fastp/$R1 --out2 trimmed_fastp/$R2
+```
+
+We ran this on many datasets that vary in size, and used `/usr/bin/time -v` to measure wall time (how long it takes the code to run) and memory usage compared to the number of sequences. Note, we use file size as a proxy for number of sequences: all this data is 300bp reads, and the files were all compressed with gzip, so there will be some variation based on efficiency of compression (dependent on the complexity of the sequence). However, since all the reads are the same length there is a linear relationship between file size and number of reads, and so reporting either number of reads of bp would essentially just change the scale of the x-axis.
+
+![Computational complexity is linear](docs/img/wall_time.png "Wall clock time is how long the code takes to run. More input data takes longer to compute!")
+
+![Memory complexity does not increase](docs/img/memory.png "More data doesn't need more memory!")
+
+We also took two datasets that were processed by each of the three tools, and then reprocessed them with the other tools. This table shows the number of additional fragments that were trimmed with the other tools. 
+
+After initial trimming:
+
+Tool | Number of reads remaining (total, R1+R2 for both libraries)
+--- | ---
+cutadapt | 17,170,630
+fastp | 17,168,188
+fast-adapter-trimming<sup>1</sup> | 17,167,974
+
+
+   | Retrimmed with cutadapt | Retrimmed with fastp | Retrimmed with fast-adapter trimming
+--- | --- | --- | ---
+Initially trimmed with cutadapt<sup>2</sup> | Full length: 0 Partial: 2,228,450 (13.0%) | 885,907 (5.2%) | 14,559 (0.08%)
+Initially trimmed wtih fastp    | Full length: 0 Partial: 1,618,009 (12.7%)  | 75,239 (0.6%) | 2,675 (0.02%)
+Initially trimmed with fast-adapter-trimming |Full length: 0 Partial: 2,839,026 (16.5%) | 1,965,436 (11.4%) | 0
+
+Notes:
+<sup>1</sup>`fast-adapter-trimming` only writes those sequences longer than a predefined cutoff - in this case, 100 bp
+<sup>2</sup>`cutadapt` reports potential trimming of 3 bp or more of primer, so these were inspected for full length trimming
+
+
+
+
+
+
 ## Wow! How do I cite this amazing piece of work
 
 Check our out DOI code and please cite it as:
