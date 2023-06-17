@@ -176,9 +176,9 @@ fastp -Q -L --adapter_fasta $PRIMERS --in1 $R1 --in2 $R2 --out1 trimmed_fastp/$R
 
 We ran this on many datasets that vary in size, and used `/usr/bin/time -v` to measure wall time (how long it takes the code to run) and memory usage compared to the number of sequences. Note, we use file size as a proxy for number of sequences: all this data is 300bp reads, and the files were all compressed with gzip, so there will be some variation based on efficiency of compression (dependent on the complexity of the sequence). However, since all the reads are the same length there is a linear relationship between file size and number of reads, and so reporting either number of reads of bp would essentially just change the scale of the x-axis.
 
-![Computational complexity is linear](docs/img/wall_time.png "Wall clock time is how long the code takes to run. More input data takes longer to compute!")
+![Computational complexity is linear](https://raw.githubusercontent.com/linsalrob/fast-adapter-trimming/main/doc/img/wall_time.png "Wall clock time is how long the code takes to run. More input data takes longer to compute!")
 
-![Memory complexity does not increase](docs/img/memory.png "More data doesn't need more memory!")
+![Memory complexity does not increase](https://raw.githubusercontent.com/linsalrob/fast-adapter-trimming/main/doc/img/memory.png "More data doesn't need more memory!")
 
 We also took two datasets that were processed by each of the three tools, and then reprocessed them with the other tools. This table shows the number of additional fragments that were trimmed with the other tools. 
 
