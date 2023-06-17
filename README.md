@@ -199,7 +199,9 @@ Initially trimmed wtih fastp    | Full length: 0 Partial: 1,618,009 (12.7%)  | 7
 Initially trimmed with fast-adapter-trimming | Full length: 0 Partial: 2,839,026 (16.5%) | 1,965,436 (11.4%) | 0
 
 Notes:
+
 <sup>1</sup>`fast-adapter-trimming` only writes those sequences longer than a predefined cutoff - in this case, 100 bp
+
 <sup>2</sup>`cutadapt` reports potential trimming of 3 bp or more of primer, so these were inspected for full length trimming
 
 
