@@ -180,23 +180,23 @@ We ran this on many datasets that vary in size, and used `/usr/bin/time -v` to m
 
 ![Memory complexity does not increase](https://raw.githubusercontent.com/linsalrob/fast-adapter-trimming/main/doc/img/memory.png "More data doesn't need more memory!")
 
-We also took two datasets that were processed by each of the three tools, and then reprocessed them with the other tools. This table shows the number of additional fragments that were trimmed with the other tools. 
+We also took one dataset that were processed by each of the three tools, and then reprocessed them with the other tools. This table shows the number of additional fragments that were trimmed with the other tools. 
 
 After initial trimming:
 
-Tool | Number of reads remaining (total, R1+R2 for both libraries)
+Tool | R1 reads remaining | R2 reads remaining
 --- | ---
-cutadapt | 17,170,630
-fastp | 17,168,188
-fast-adapter-trimming<sup>1</sup> | 17,167,974
+cutadapt |  4,494,481 | 4,494,481
+fastp | 4,493,717 | 4,493,717
+fast-adapter-trimming<sup>1</sup> |  4,493,717 |  4,493,717
 
-
+I tried to measure remaining primers by looking at how much more each tool trims off the other, but this data is completely misleading!
 
 Tool   | Retrimmed with cutadapt | Retrimmed with fastp | Retrimmed with fast-adapter trimming
 --- | --- | --- | ---
-Initially trimmed with cutadapt<sup>2</sup> | Full length: 0 Partial: 2,228,450 (13.0%) | 885,907 (5.2%) | 14,559 (0.08%)
-Initially trimmed wtih fastp    | Full length: 0 Partial: 1,618,009 (12.7%)  | 75,239 (0.6%) | 2,675 (0.02%)
-Initially trimmed with fast-adapter-trimming | Full length: 0 Partial: 2,839,026 (16.5%) | 1,965,436 (11.4%) | 0
+Initially trimmed with cutadapt<sup>2</sup> | Full length: 0 Partial: 1,249,303 (R1: 639,198, R2: 610,105) | 493,099 |  9,084 (R1: 7333, R2: 1751)
+Initially trimmed wtih fastp    | Full length: 0 Partial: 1,799,903 (R1: 915,655, R2: 884,248)  |  46,957| 1,615 (R1: 925, R2: 690)
+Initially trimmed with fast-adapter-trimming | Full length: 0 Partial: 2,839,026 (R1: 1,411,522, R2: 1,427,504) | 181,4996 | 0
 
 Notes:
 
@@ -205,6 +205,9 @@ Notes:
 <sup>2</sup>`cutadapt` reports potential trimming of 3 bp or more of primer, so these were inspected for full length trimming
 
 
+## Remaining Issue
+
+There is an issue with adapters at the end of the sequence. That issue needs to be addressed before continuing.
 
 
 
