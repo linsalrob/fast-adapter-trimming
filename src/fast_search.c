@@ -194,7 +194,7 @@ void fast_search(struct options *opt) {
 				seq->qual.s[trim] = '\0';
 				counts.R1_trimmed++;
 			}
-			if (pipe && strlen(seq->seq.s) > opt->min_length)
+			if (pipe && strlen(seq->seq.s) > opt->min_sequence_length)
 				fprintf(pipe, "@%s %s\n%s\n+\n%s\n", seq->name.s, seq->comment.s, seq->seq.s, seq->qual.s);
 		}
 
@@ -296,7 +296,7 @@ void fast_search(struct options *opt) {
 				seq->qual.s[trim] = '\0';
 				counts.R2_trimmed++;
 			}
-			if (pipe && strlen(seq->seq.s) > opt->min_length)
+			if (pipe && strlen(seq->seq.s) > opt->min_sequence_length)
 				fprintf(pipe, "@%s %s\n%s\n+\n%s\n", seq->name.s, seq->comment.s, seq->seq.s, seq->qual.s);
 		}
 		if (pipe)

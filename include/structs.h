@@ -18,7 +18,8 @@ struct options {
 	char* R1_matches;
 	char* R2_matches;
 	char* adjustments;
-	int min_length;
+	int min_sequence_length;
+	int min_adapter_length;
 	char* primers;
 	int primer_occurrences;
 	bool reverse;

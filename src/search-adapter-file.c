@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
 	opt->R2_output = NULL;
 	opt->R1_matches = NULL;
 	opt->R2_matches = NULL;
-	opt->min_length = 100;
+	opt->min_sequence_length = 100;
 	opt->primer_occurrences = 50;
 	opt->reverse = true;
 	opt->primers = NULL;
@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
 				opt->primers = strdup(optarg);
 				break;
 			case 'l':
-				opt->min_length = atoi(optarg);
+				opt->min_sequence_length = atoi(optarg);
 				break;
 			case 'd': 
 				opt->debug = true;

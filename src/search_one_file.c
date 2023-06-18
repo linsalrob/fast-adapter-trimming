@@ -209,7 +209,7 @@ void *fast_search_one_file(void *thrargs) {
 				seq->qual.s[trim] = '\0';
 				counts.R1_trimmed++;
 			}
-			if (pipe && strlen(seq->seq.s) > opt->min_length)
+			if (pipe && strlen(seq->seq.s) > opt->min_sequence_length)
 				fprintf(pipe, "@%s %s\n%s\n+\n%s\n", seq->name.s, seq->comment.s, seq->seq.s, seq->qual.s);
 		}
 

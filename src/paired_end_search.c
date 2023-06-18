@@ -358,7 +358,7 @@ void paired_end_search(struct options *opt) {
 			seq->qual.s[trim] = '\0';
 			counts.R2_trimmed++;
 		}
-		if (pipe && strlen(seq->seq.s) > opt->min_length)
+		if (pipe && strlen(seq->seq.s) > opt->min_sequence_length)
 			fprintf(pipe, "@%s %s\n%s\n+\n%s\n", seq->name.s, seq->comment.s, seq->seq.s, seq->qual.s);
 
 
@@ -400,7 +400,7 @@ void paired_end_search(struct options *opt) {
 				if (R1 == NULL)
 					break;
 			}
-			if (strlen(seq->seq.s) > opt->min_length)
+			if (strlen(seq->seq.s) > opt->min_sequence_length)
 				fprintf(pipe, "@%s %s\n%s\n+\n%s\n", seq->name.s, seq->comment.s, seq->seq.s, seq->qual.s);
 		}
 
