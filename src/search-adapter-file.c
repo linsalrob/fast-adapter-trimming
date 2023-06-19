@@ -26,6 +26,7 @@ void help() {
 	printf("-q --outputR2 R2 output fastq file (will be gzip compressed)\n");
 	printf("-j --matchesR1 Write the R1 matches to this file. Default: stdout\n");
 	printf("-k --matchesR2 Write the R2 matches to this file. Default: stdout\n");
+	printf("-m --adapterlen Minimum adapter length to match at the 3' end of the sequence. We search for this sequence within the last k bp. Default: 6\n");
 	printf("-l --length Minimum sequence length (bp). Sequences shorter than this will be filtered out (Default 100)\n");
 	printf("--noreverse Do not reverse the sequences\n");
 	printf("--adjustments Write the trimming adjustments here\n");
@@ -61,6 +62,7 @@ int main(int argc, char* argv[]) {
 	opt->R1_matches = NULL;
 	opt->R2_matches = NULL;
 	opt->min_sequence_length = 100;
+	opt->min_adapter_length = 6;
 	opt->primer_occurrences = 50;
 	opt->reverse = true;
 	opt->primers = NULL;
@@ -81,6 +83,7 @@ int main(int argc, char* argv[]) {
 		{"matchesR1",  required_argument, 0, 'j'},
 		{"matchesR2",  required_argument, 0, 'k'},
 		{"length", required_argument, 0, 'l'},
+		{"adapterlen", required_argument, 0, 'm'},
 		{"primeroccurrences", required_argument, 0, 3},
 		{"paired_end", no_argument, 0, 4},
 		{"nothreads", no_argument, 0, 5},
@@ -92,7 +95,7 @@ int main(int argc, char* argv[]) {
 		{0, 0, 0, 0}
 	};
 	int option_index = 0;
-	while ((gopt = getopt_long(argc, argv, "1:2:p:q:f:j:k:l:bndv", long_options, &option_index )) != -1) {
+	while ((gopt = getopt_long(argc, argv, "1:2:p:q:f:j:k:l:m:bndv", long_options, &option_index )) != -1) {
 		switch (gopt) {
 			case '1' :
 				opt->R1_file = strdup(optarg);
@@ -117,6 +120,9 @@ int main(int argc, char* argv[]) {
 				break;
 			case 'l':
 				opt->min_sequence_length = atoi(optarg);
+				break;
+			case 'm':
+				opt->min_adapter_length = atoi(optarg);
 				break;
 			case 'd': 
 				opt->debug = true;

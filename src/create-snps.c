@@ -13,7 +13,7 @@
 
 
 
-void create_all_snps(char *adapter, int kmer, char* seqid, kmer_bst_t *primers) {
+void create_all_snps(char *adapter, int kmer, char* seqid, kmer_bst_t *primers, bool verbose) {
 	/*
 	 * calculate a SNP at every position. This is O(3*k) where k is length of kmer
 	 */
@@ -33,6 +33,8 @@ void create_all_snps(char *adapter, int kmer, char* seqid, kmer_bst_t *primers) 
 			sprintf(name, "%s %d %c->%c", seqid, i, adapter[i], snp[i]);
 			uint64_t encs = kmer_encoding(snp, 0, kmer);
 			add_primer(encs, name, primers);
+			if (verbose)
+				fprintf(stderr, "Added primer: %s (%s) enc: %ld\n", name, snp, encs);
 		}
 	}
 }

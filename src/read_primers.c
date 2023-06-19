@@ -110,7 +110,7 @@ void read_primers_create_snps(char* primerfile, kmer_bst_t** all_primers, bool r
 			kmer = MAXKMER;
 		}
 
-		create_all_snps(seq->seq.s, kmer, seq->name.s, all_primers[kmer]);
+		create_all_snps(seq->seq.s, kmer, seq->name.s, all_primers[kmer], false);
 		
 		if (reverse) {
 			char revname[seq->name.l+3];
@@ -121,7 +121,7 @@ void read_primers_create_snps(char* primerfile, kmer_bst_t** all_primers, bool r
 			
 			char* rcseq = malloc(seq->seq.l + 1);
 			rc(rcseq, seq->seq.s);
-			create_all_snps(rcseq, kmer, revname, all_primers[kmer]);
+			create_all_snps(rcseq, kmer, revname, all_primers[kmer], false);
 
 		}
 			
@@ -133,3 +133,60 @@ void read_primers_create_snps(char* primerfile, kmer_bst_t** all_primers, bool r
 		fprintf(stderr, "Closing the kseq filehandle returned %d\n", ret);
 	kseq_destroy(seq);
 }
+
+
+
+char* substring(char* str, int start, int end) {
+    int length = end - start;
+    char* result = malloc((length + 1) * sizeof(char));
+
+    int i, j;
+    for (i = start, j = 0; i < end; i++, j++) {
+        result[j] = str[i];
+    }
+
+    result[j] = '\0'; // Add null terminator to mark the end of the substring
+
+    return result;
+}
+
+
+void read_trunc_primers(char* primerfile, int maxlen, kmer_bst_t* trunc_primers, bool reverse, int verbose) {
+	// read the primers and truncate them to maxlen. Remember if we have that sequence and if not, add it to the kmer_bst
+	if( access( primerfile, R_OK ) == -1 ) {
+		// file doesn't exist
+		fprintf(stderr, "%sERROR: The file %s can not be found. Please check the file path%s\n", RED, primerfile, ENDC);
+		return;
+	}
+
+	gzFile fp;
+	kseq_t *seq;
+
+	if (verbose)
+		fprintf(stderr, "%sREADING %s to truncate to %d%s\n", PINK, primerfile, maxlen, ENDC);
+
+	if (maxlen > MAXKMER)
+		fprintf(stderr, "%sTruncated the longest primers from %d to %d%s\n", BLUE, maxlen, MAXKMER, ENDC);
+
+	fp = gzopen(primerfile, "r");
+	seq = kseq_init(fp);
+	int l;
+	while ((l = kseq_read(seq)) >= 0) {
+		create_all_snps(substring(seq->seq.s, 0, maxlen), maxlen, seq->name.s, trunc_primers, false);
+		if (reverse) {
+			char revname[seq->name.l+3];
+			strcpy(revname, seq->name.s);
+			strcat(revname, " rc");
+			char* rcseq = malloc(seq->seq.l+ 1);
+			rc(rcseq, seq->seq.s);
+			create_all_snps(substring(rcseq, 0, maxlen), maxlen, revname, trunc_primers, false);
+		}
+			
+	}
+
+	int ret = gzclose(fp);
+	if (ret != 0)
+		fprintf(stderr, "Closing the kseq filehandle returned %d\n", ret);
+	kseq_destroy(seq);
+}
+

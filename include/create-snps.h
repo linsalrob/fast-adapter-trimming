@@ -3,7 +3,7 @@
 
 #include "structs.h"
 
-void create_all_snps(char *, int, char*, kmer_bst_t *);
+void create_all_snps(char *, int, char*, kmer_bst_t *, bool);
 
 #endif
 

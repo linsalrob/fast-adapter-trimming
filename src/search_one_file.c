@@ -56,6 +56,7 @@ void *fast_search_one_file(void *thrargs) {
 	COUNTS counts = {};
 
 	// create an array of kmer_bsts and malloc them
+	// all_primers is the full length sequences
 	kmer_bst_t *all_primers[MAXKMER+1];
 
 	for (int i = 0; i<=MAXKMER; i++) {
@@ -67,12 +68,24 @@ void *fast_search_one_file(void *thrargs) {
 		}
 		all_primers[i]->bigger = NULL;
 		all_primers[i]->smaller = NULL;
-		all_primers[i]->value = 0;
+		all_primers[i]->value = -1;
 		all_primers[i]->id = "";
 	}
-
-	// read the primer file
+	
+	// read the primer file for all primers
 	read_primers_create_snps(opt->primers, all_primers, opt->reverse, opt->verbose);
+
+	// trunc_primers is the short sequences that will be searched at the 3' end of the sequence
+	// these sequences are all the same length (default: 6 bp)
+	kmer_bst_t *trunc_primers;
+	trunc_primers = malloc(sizeof(kmer_bst_t));
+	trunc_primers->bigger = NULL;
+	trunc_primers->smaller = NULL;
+	trunc_primers->value = -1;
+	trunc_primers->id = "";
+
+	// read the primer file again and truncate the primers
+	read_trunc_primers(opt->primers, opt->min_adapter_length, trunc_primers, opt->reverse, opt->verbose);
 
 	if (opt->debug) {	
 		fprintf(stderr, "%sWe have read the primers%s\n", GREEN, ENDC);
