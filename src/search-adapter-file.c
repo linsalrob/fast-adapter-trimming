@@ -10,6 +10,7 @@
 #include <getopt.h>
 #include <string.h>
 #include <pthread.h>
+#include "definitions.h"
 #include "structs.h"
 #include "search.h"
 #include "colours.h"
@@ -27,6 +28,7 @@ void help() {
 	printf("-j --matchesR1 Write the R1 matches to this file. Default: stdout\n");
 	printf("-k --matchesR2 Write the R2 matches to this file. Default: stdout\n");
 	printf("-m --adapterlen Minimum adapter length to match at the 3' end of the sequence. We search for this sequence within the last k bp. Default: 6\n");
+	printf("-t --trimadapters Maximum length to be used for an adapter (default = 31 bp). We can't go longer than 31 bp, but we can do shorter!\n");
 	printf("-l --length Minimum sequence length (bp). Sequences shorter than this will be filtered out (Default 100)\n");
 	printf("--noreverse Do not reverse the sequences\n");
 	printf("--adjustments Write the trimming adjustments here\n");
@@ -63,6 +65,7 @@ int main(int argc, char* argv[]) {
 	opt->R2_matches = NULL;
 	opt->min_sequence_length = 100;
 	opt->min_adapter_length = 6;
+	opt->maxkmer = 31;
 	opt->primer_occurrences = 50;
 	opt->reverse = true;
 	opt->primers = NULL;
@@ -85,6 +88,7 @@ int main(int argc, char* argv[]) {
 		{"length", required_argument, 0, 'l'},
 		{"adapterlen", required_argument, 0, 'm'},
 		{"primeroccurrences", required_argument, 0, 3},
+		{"trimadapter", required_argument, 0, 't'},
 		{"paired_end", no_argument, 0, 4},
 		{"nothreads", no_argument, 0, 5},
 		{"adjustments", required_argument, 0, 6},
@@ -95,7 +99,7 @@ int main(int argc, char* argv[]) {
 		{0, 0, 0, 0}
 	};
 	int option_index = 0;
-	while ((gopt = getopt_long(argc, argv, "1:2:p:q:f:j:k:l:m:bndv", long_options, &option_index )) != -1) {
+	while ((gopt = getopt_long(argc, argv, "1:2:p:q:f:j:k:l:m:t:bndv", long_options, &option_index )) != -1) {
 		switch (gopt) {
 			case '1' :
 				opt->R1_file = strdup(optarg);
@@ -123,6 +127,13 @@ int main(int argc, char* argv[]) {
 				break;
 			case 'm':
 				opt->min_adapter_length = atoi(optarg);
+				break;
+			case 't':
+				opt->maxkmer = atoi(optarg);
+				if (opt->maxkmer > MAXKMER) {
+					fprintf(stderr, "%sERROR: Can't use a kmer longer than %d. Option -t (--trimadapter) adjusted to %d%s\n", RED, MAXKMER, MAXKMER, ENDC);
+					opt->maxkmer = MAXKMER;
+				}
 				break;
 			case 'd': 
 				opt->debug = true;

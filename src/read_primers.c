@@ -28,11 +28,11 @@
 
 KSEQ_INIT(gzFile, gzread);
 
-void read_primers(char* primerfile, kmer_bst_t** all_primers, bool reverse, int verbose) {
+void read_primers(char* primerfile, kmer_bst_t** all_primers, int maxkmer, bool reverse, int verbose) {
 	/*
 	 * encode the primers in primerfile 
 	 *
-	 * We expect all_primers to be an array of 0-MAXKMER kmer_bst_t's
+	 * We expect all_primers to be an array of 0-maxkmer kmer_bst_t's
 	 *
 	 * Note: we need to take the correct substring of the sequence to reverse complement! We need the rightmose k-bases 
 	 * otherwise we have an offset of length(string) - kmer to where the match should be.
@@ -52,9 +52,9 @@ void read_primers(char* primerfile, kmer_bst_t** all_primers, bool reverse, int 
 	int l;
 	while ((l = kseq_read(seq)) >= 0) {
 		int kmer = seq->seq.l;
-		if (seq->seq.l > MAXKMER) {
+		if (seq->seq.l > maxkmer) {
 			fprintf(stderr, "%sWARNING: Length of %s is longer than our maximum (%ld bp), so we had to truncate it%s\n", RED, seq->name.s, seq->seq.l, ENDC);
-			kmer = MAXKMER;
+			kmer = maxkmer;
 		}
 		uint64_t enc = kmer_encoding(seq->seq.s, 0, kmer);
 		
@@ -77,11 +77,11 @@ void read_primers(char* primerfile, kmer_bst_t** all_primers, bool reverse, int 
 	gzclose(fp);
 }
 
-void read_primers_create_snps(char* primerfile, kmer_bst_t** all_primers, bool reverse, int verbose) {
+void read_primers_create_snps(char* primerfile, kmer_bst_t** all_primers, int maxkmer, bool reverse, int verbose) {
 	/*
 	 * encode the primers in primerfile and create all snps for all primers.
 	 *
-	 * We expect all_primers to be an array of 0-MAXKMER kmer_bst_t's
+	 * We expect all_primers to be an array of 0-maxkmer kmer_bst_t's
 	 *
 	 * Note: we need to take the correct substring of the sequence to reverse complement! We need the rightmose k-bases 
 	 * otherwise we have an offset of length(string) - kmer to where the match should be.
@@ -104,10 +104,10 @@ void read_primers_create_snps(char* primerfile, kmer_bst_t** all_primers, bool r
 	int l;
 	while ((l = kseq_read(seq)) >= 0) {
 		int kmer = seq->seq.l;
-		if (seq->seq.l > MAXKMER) {
+		if (seq->seq.l > maxkmer) {
 			if (verbose)
 				fprintf(stderr, "%sWARNING: Length of %s is longer than our maximum (%ld bp), so we had to truncate it%s\n", RED, seq->name.s, seq->seq.l, ENDC);
-			kmer = MAXKMER;
+			kmer = maxkmer;
 		}
 
 		create_all_snps(seq->seq.s, kmer, seq->name.s, all_primers[kmer], false);

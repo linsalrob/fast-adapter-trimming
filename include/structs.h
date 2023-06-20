@@ -20,6 +20,7 @@ struct options {
 	char* adjustments;
 	int min_sequence_length;
 	int min_adapter_length;
+	int maxkmer;
 	char* primers;
 	int primer_occurrences;
 	bool reverse;

@@ -57,9 +57,9 @@ void *fast_search_one_file(void *thrargs) {
 
 	// create an array of kmer_bsts and malloc them
 	// all_primers is the full length sequences
-	kmer_bst_t *all_primers[MAXKMER+1];
+	kmer_bst_t *all_primers[opt->maxkmer+1];
 
-	for (int i = 0; i<=MAXKMER; i++) {
+	for (int i = 0; i<=opt->maxkmer; i++) {
 		all_primers[i] = malloc(sizeof(kmer_bst_t));
 
 		if (all_primers[i] == NULL) {
@@ -73,7 +73,7 @@ void *fast_search_one_file(void *thrargs) {
 	}
 	
 	// read the primer file for all primers
-	read_primers_create_snps(opt->primers, all_primers, opt->reverse, opt->verbose);
+	read_primers_create_snps(opt->primers, all_primers, opt->maxkmer, opt->reverse, opt->verbose);
 
 	// trunc_primers is the short sequences that will be searched at the 3' end of the sequence
 	// these sequences are all the same length (default: 6 bp)
@@ -85,11 +85,12 @@ void *fast_search_one_file(void *thrargs) {
 	trunc_primers->id = "";
 
 	// read the primer file again and truncate the primers
-	read_trunc_primers(opt->primers, opt->min_adapter_length, trunc_primers, opt->reverse, opt->verbose);
+	if (opt->min_adapter_length > 0)
+		read_trunc_primers(opt->primers, opt->min_adapter_length, trunc_primers, opt->reverse, opt->verbose);
 
 	if (opt->debug) {	
 		fprintf(stderr, "%sWe have read the primers%s\n", GREEN, ENDC);
-		for (int i = 0; i<=MAXKMER; i++)
+		for (int i = 0; i<=opt->maxkmer; i++)
 			print_all_primers(all_primers[i], i);
 	}
 
@@ -101,9 +102,9 @@ void *fast_search_one_file(void *thrargs) {
 	// We also do this longer primers to shorter, so that we initially trim off the
 	// longest possible primers
 
-	int kmer_lengths[MAXKMER];
+	int kmer_lengths[opt->maxkmer];
 	int unique_kmer_count = 0;
-	for (int i=MAXKMER; i>=0; i--) 
+	for (int i=opt->maxkmer; i>=0; i--) 
 		if (all_primers[i]->value > 0) 
 			kmer_lengths[unique_kmer_count++] = i; 	// we need to remember this kmer length
 
@@ -192,7 +193,7 @@ void *fast_search_one_file(void *thrargs) {
 			}
 
 
-			for (int posn=1; posn<seq->seq.l - MAXKMER + 1; posn++) {
+			for (int posn=1; posn<seq->seq.l - opt->maxkmer + 1; posn++) {
 				for (int i=0; i<unique_kmer_count; i++) {
 					// calculate the next encoding for this kmer length
 					uint64_t enc  = next_kmer_encoding(seq->seq.s, posn, kmer_lengths[i], encoded_kmers[i]);
@@ -213,10 +214,10 @@ void *fast_search_one_file(void *thrargs) {
 
 			// if we have not trimmed any sequences, we start at length-kmer and 
 			// remove from the first trunc_primer we find
-			if (trim == -1) {
-				// we start a little bit before MAXKMER in case there are any frameshifts
-				uint64_t enc  =  kmer_encoding(seq->seq.s, seq->seq.l - MAXKMER - 5, opt->min_adapter_length);
-				for (int posn = seq->seq.l - MAXKMER - 4; posn < seq->seq.l - opt->min_adapter_length; posn++) {
+			if (trim == -1 && opt->min_adapter_length > 0) {
+				// we start a little bit before opt->maxkmer in case there are any frameshifts
+				uint64_t enc  =  kmer_encoding(seq->seq.s, seq->seq.l - opt->maxkmer - 5, opt->min_adapter_length);
+				for (int posn = seq->seq.l - opt->maxkmer - 4; posn < seq->seq.l - opt->min_adapter_length; posn++) {
 					enc  = next_kmer_encoding(seq->seq.s, posn, opt->min_adapter_length, enc);
 					kmer_bst_t *ks = find_primer(enc, trunc_primers);
 					if (ks) {
@@ -259,7 +260,7 @@ void *fast_search_one_file(void *thrargs) {
 		if (pipe)
 			pclose(pipe);
 
-	for (int i=0; i<=MAXKMER; i++)
+	for (int i=0; i<=opt->maxkmer; i++)
 		free(all_primers[i]);
 
 	printf("File name: %s\n", fqfile);
