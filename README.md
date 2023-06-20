@@ -77,14 +77,18 @@ Search for primers listed in --primers, allowing for 1-bp mismatches, against al
 -q --outputR2 R2 output fastq file (will be gzip compressed)
 -j --matchesR1 Write the R1 matches to this file. Default: stdout
 -k --matchesR2 Write the R2 matches to this file. Default: stdout
--n --noreverse Do not reverse the sequences
--a --adjustments Write the trimming adjustments here
+-m --adapterlen Minimum adapter length to match at the 3' end of the sequence. We search for this sequence within the last k bp. Default: 6
+-t --trimadapters Maximum length to be used for an adapter (default = 31 bp). We can't go longer than 31 bp, but we can do shorter!
+-l --length Minimum sequence length (bp). Sequences shorter than this will be filtered out (Default 100)
+--noreverse Do not reverse the sequences
+--adjustments Write the trimming adjustments here
 --paired_end use a paired end (slower) search.
 --primeroccurrences minimum number of times a primer was matched to include in the report
 --nothreads use a single thread only. We typically want upto 4 threads to read and write R1 and R2 files
 --verbose more output (but less than --debug)
 --debug more more output
 -v --version print the version and exit
+
 ```
 
 
@@ -98,16 +102,22 @@ Short option | Long option | Required? | Meaning
 `-q` | `--outputR2` | Optional | Where to write the trimmed fastq reads from R2. This will be gzip compressed.
 `-j` | `--matchesR1` |  Optional | Where to write a list of the adapters that match the R1 reads. This is a tab separated output of `adapter name`, `R1 sequence ID`, `matched position`, `offset from the right end`.
 `-k` | `--matchesR2` | Optional | Where to write a list of the adapters that match the R2 reads. Same format as above.
-`-n` | `--noreverse` | Optional | Only consider the forward direction of the adapers. By default we look for both the adapter sequences as specified in `--primers` and their reverse complement.
-`-a` | `--adjustments` | Optional | Only valid with `--paired_end`. Where to write a summary of the adjustments to the R1 or R2 read trimming locations. If we find adapters in different locations in the R1 and R2 mate pairs, this file summarises the changes we made to accomodate both primers.
-  &nbsp; | `--paired_end` | Optional | Use a paired end search which is slower and requires slightly more RAM.
-  &nbsp; | `--primeroccurrences` | Optional | At the end we summarise the adapters that we found. This limits that output to those adapters found _n_ times or more. We often find one read that matches a single adapter (e.g. because there is a sequencing error), and so this just limits that output.
-  &nbsp; | `--nothreads` | Optional | Only use a single thread for searching for the adapters.
-  &nbsp; | `--versbose` | Optional | Write a lot more output
-  &nbsp; | `--debug` | Optional | Write a lot, lot more output
+`-m` | `--adapterlen` | Optional | This is for accessory 3' trimming (see below)
+`-l` | `--trimadapters` | Optional | The adapters range in length upto about 40 bp. This parameter will limit the maximum length of the adapter. Often an 18 bp or 21 bp sequence is sufficient to find all the adapters.
+ &nbsp; | `--noreverse` | Optional | Only consider the forward direction of the adapers. By default we look for both the adapter sequences as specified in `--primers` and their reverse complement.
+ &nbsp; | `--adjustments` | Optional | Only valid with `--paired_end`. Where to write a summary of the adjustments to the R1 or R2 read trimming locations. If we find adapters in different locations in the R1 and R2 mate pairs, this file summarises the changes we made to accomodate both primers.
+ &nbsp; | `--paired_end` | Optional | Use a paired end search which is slower and requires slightly more RAM.
+ &nbsp; | `--primeroccurrences` | Optional | At the end we summarise the adapters that we found. This limits that output to those adapters found _n_ times or more. We often find one read that matches a single adapter (e.g. because there is a sequencing error), and so this just limits that output.
+ &nbsp; | `--nothreads` | Optional | Only use a single thread for searching for the adapters.
+ &nbsp; | `--verbose` | Optional | Write a lot more output
+ &nbsp; | `--debug` | Optional | Write a lot, lot more output
 `-v` | `--version` | Optional | Print the version and exit.
 
+## Accessory 3' trimming
 
+Often adapters occur towards the end of the sequences. We provide a mecahnism to trim partial adapters that may occur at the end of the sequence and maybe missed through regular trimming because they are partial sequences. 
+
+You can set a shorter adapter length using the `-m`/`--adapterlen` parameter which will look for short sequences of length _m_ at the end of the sequence. By default, we look for 6 bp of sequence matching within the last 35 bp of the sequence. The _m_ parameter sets the 6 to a longer sequence if need. Set this to 0 to deactivate secondary trimming at the 3' end.
 
 
 # How does it work?
@@ -204,10 +214,6 @@ Notes:
 
 <sup>2</sup>`cutadapt` reports potential trimming of 3 bp or more of primer, so these were inspected for full length trimming
 
-
-## Remaining Issue
-
-There is an issue with adapters at the end of the sequence. That issue needs to be addressed before continuing.
 
 
 
