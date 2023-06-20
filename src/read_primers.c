@@ -172,21 +172,25 @@ void read_trunc_primers(char* primerfile, int maxlen, kmer_bst_t* trunc_primers,
 	seq = kseq_init(fp);
 	int l;
 	while ((l = kseq_read(seq)) >= 0) {
-		create_all_snps(substring(seq->seq.s, 0, maxlen), maxlen, seq->name.s, trunc_primers, false);
+		char tname[seq->name.l+6];
+		strcpy(tname, seq->name.s);
+		strcat(tname, " trunc");
+		create_all_snps(substring(seq->seq.s, 0, maxlen), maxlen, tname, trunc_primers, false);
 		if (reverse) {
-			char revname[seq->name.l+3];
+			char revname[seq->name.l+8];
 			strcpy(revname, seq->name.s);
-			strcat(revname, " rc");
+			strcat(revname, " trunc rc");
 			char* rcseq = malloc(seq->seq.l+ 1);
 			rc(rcseq, seq->seq.s);
 			create_all_snps(substring(rcseq, 0, maxlen), maxlen, revname, trunc_primers, false);
 		}
-			
+		if (verbose)
+			fprintf(stderr, "%sEncoding %s with length %ld using k-mer %d%s\n", GREEN, seq->seq.s, seq->seq.l, maxlen, ENDC);
 	}
 
 	int ret = gzclose(fp);
 	if (ret != 0)
-		fprintf(stderr, "Closing the kseq filehandle returned %d\n", ret);
+		fprintf(stderr, "Closing the kseq filehandle after reading truncated primers returned %d\n", ret);
 	kseq_destroy(seq);
 }
 

@@ -211,6 +211,27 @@ void *fast_search_one_file(void *thrargs) {
 				}
 			}
 
+			// if we have not trimmed any sequences, we start at length-kmer and 
+			// remove from the first trunc_primer we find
+			if (trim == -1) {
+				// we start a little bit before MAXKMER in case there are any frameshifts
+				uint64_t enc  =  kmer_encoding(seq->seq.s, seq->seq.l - MAXKMER - 5, opt->min_adapter_length);
+				for (int posn = seq->seq.l - MAXKMER - 4; posn < seq->seq.l - opt->min_adapter_length; posn++) {
+					enc  = next_kmer_encoding(seq->seq.s, posn, opt->min_adapter_length, enc);
+					kmer_bst_t *ks = find_primer(enc, trunc_primers);
+					if (ks) {
+						primerid = strdup(ks->id);
+						before = seq->seq.s[posn-1];
+						after = seq->seq.s[opt->min_adapter_length+1];
+						trim = posn;
+						if (opt->debug && strcmp(fqfile, opt->R1_file) == 0)
+							fprintf(stderr, "TRUNC: %s %s ID: %s PRIMERID: %s TRIM: %d kmer len: %d kmer seq: %s\n", fqfile, seq->name.s, ks->id, primerid, trim, opt->min_adapter_length, kmer_decoding(enc, opt->min_adapter_length));
+						break;
+					}
+				}
+			}
+
+
 			if (trim > -1) {
 				counts.R1_found++;
 				if (strlen(primerid) < 5)
@@ -218,6 +239,8 @@ void *fast_search_one_file(void *thrargs) {
 				count_primer_occurrence(pc, primerid, before, after);
 				if (matchesfile)
 					fprintf(match_out, "R1\t%s\t%s\t%d\t-%ld\n", primerid, seq->name.s, trim, seq->seq.l-trim);
+				if (opt->debug)
+					fprintf(stderr, "Trimming %s to %d\n", seq->name.s, trim);
 				seq->seq.s[trim] = '\0';
 				seq->qual.s[trim] = '\0';
 				counts.R1_trimmed++;
